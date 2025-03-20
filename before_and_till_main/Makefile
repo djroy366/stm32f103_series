@@ -71,3 +71,12 @@ $(BIN_DIR)/$(TARGET).bin: $(BIN_DIR)/$(TARGET).elf
 clean:
 	rm -rf $(BUILD_DIR)
 
+
+# Define CPPCHECK tool (update path if needed)
+CPPCHECK = cppcheck  
+
+.PHONY: CPPCHECK
+
+CPPCHECK:
+	$(CPPCHECK) --quiet --enable=all --error-exitcode=1 --inline-suppr -I $(INCLUDE_DIRS) $(wildcard *.c) $(wildcard *.S)
+

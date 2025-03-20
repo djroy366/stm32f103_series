@@ -1,10 +1,19 @@
+# Target binary name
 TARGET = main
 
-# Define the linker script location and chip architecture.
+# Directory structure for build output
+BUILD_DIR = build
+OBJ_DIR = $(BUILD_DIR)/obj
+BIN_DIR = $(BUILD_DIR)/bin
+
+# Ensure directories exist
+$(shell mkdir -p $(OBJ_DIR) $(BIN_DIR))
+
+# Define the linker script and chip architecture
 LD_SCRIPT = stm32f103.ld
 MCU_SPEC  = cortex-m0
 
-# Toolchain definitions (ARM bare metal defaults)
+# Toolchain definitions
 TOOLCHAIN = /usr
 CC = $(TOOLCHAIN)/bin/arm-none-eabi-gcc
 AS = $(TOOLCHAIN)/bin/arm-none-eabi-as
@@ -13,64 +22,52 @@ OC = $(TOOLCHAIN)/bin/arm-none-eabi-objcopy
 OD = $(TOOLCHAIN)/bin/arm-none-eabi-objdump
 OS = $(TOOLCHAIN)/bin/arm-none-eabi-size
 
-# Assembly directives.
-ASFLAGS += -c
-ASFLAGS += -O0
-ASFLAGS += -mcpu=$(MCU_SPEC)
-ASFLAGS += -mthumb
-ASFLAGS += -Wall
-
-# (Set error messages to appear on a single line.)
-ASFLAGS += -fmessage-length=0
-
-# C compilation directives
-CFLAGS += -mcpu=$(MCU_SPEC)
-CFLAGS += -mthumb
-CFLAGS += -Wall
-CFLAGS += -g
-
-# (Set error messages to appear on a single line.)
-CFLAGS += -fmessage-length=0
-
-# (Set system to ignore semihosted junk)
+# Include directories
+INCLUDE_DIRS = ./include ./lib
+CFLAGS = -mcpu=$(MCU_SPEC) -mthumb -Wall -g
+CFLAGS += $(addprefix -I,$(INCLUDE_DIRS))  
 CFLAGS += --specs=nosys.specs
 
-# Linker directives.
-LSCRIPT = ./$(LD_SCRIPT)
-LFLAGS += -mcpu=$(MCU_SPEC)
-LFLAGS += -mthumb
-LFLAGS += -Wall
-LFLAGS += --specs=nosys.specs
-LFLAGS += -nostdlib
-LFLAGS += -lgcc
-LFLAGS += -T$(LSCRIPT)
+# Assembler directives
+ASFLAGS = -mcpu=$(MCU_SPEC) -mthumb -Wall -c -O0
 
-VECT_TBL = ./vector_table.S
-AS_SRC   = ./core.S
-C_SRC    = ./main.c
+# Linker flags
+LFLAGS = -mcpu=$(MCU_SPEC) -mthumb -Wall --specs=nosys.specs -nostdlib -lgcc -T$(LD_SCRIPT)
 
-OBJS =  $(VECT_TBL:.S=.o)
-OBJS += $(AS_SRC:.S=.o)
-OBJS += $(C_SRC:.c=.o)
+# Source files
+VECT_TBL = vector_table.S
+AS_SRC   = core.S
+C_SRC    = main.c
 
+# Object files
+OBJS = $(OBJ_DIR)/vector_table.o $(OBJ_DIR)/core.o $(OBJ_DIR)/main.o
+
+# Default rule
 .PHONY: all
-all: $(TARGET).bin
+all: $(BIN_DIR)/$(TARGET).bin
 
-%.o: %.S
+# Assemble `.S` files
+$(OBJ_DIR)/%.o: %.S
+	@mkdir -p $(dir $@)
 	$(CC) -x assembler-with-cpp $(ASFLAGS) $< -o $@
 
-%.o: %.c
-	$(CC) -c $(CFLAGS) $(INCLUDE) $< -o $@
+# Compile `.c` files
+$(OBJ_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) -c $(CFLAGS) $< -o $@
 
-$(TARGET).elf: $(OBJS)
+# Link objects into an ELF file
+$(BIN_DIR)/$(TARGET).elf: $(OBJS)
+	@mkdir -p $(dir $@)
 	$(CC) $^ $(LFLAGS) -o $@
 
-$(TARGET).bin: $(TARGET).elf
+# Convert ELF to binary
+$(BIN_DIR)/$(TARGET).bin: $(BIN_DIR)/$(TARGET).elf
 	$(OC) -S -O binary $< $@
-	$(OS) $<
+	$(OS) $<  
 
+# Clean build files
 .PHONY: clean
 clean:
-	rm -f $(OBJS)
-	rm -f $(TARGET).elf
-	rm -f $(TARGET).bin
+	rm -rf $(BUILD_DIR)
+

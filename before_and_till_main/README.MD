@@ -29,3 +29,6 @@ Flash and Debug :  st-util running in another termminal (this creates the connec
 
 
 Updated the Linker script, Added vector_table and also the code to copy the memory segments from flash to RAM in core.S with main code's memory sections also commented it.
+
+
+Updated the Makefile, Also Added /build directory to the .gitignore as it's not relevent

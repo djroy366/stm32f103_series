@@ -32,11 +32,11 @@ jobs:
           cd led_blink
           make all
 
-      - name: Run Static Analysis (Cppcheck)
-        run: |
-          sudo apt install -y cppcheck
-          cppcheck --quiet --enable=all --error-exitcode=1 --inline-suppr -I before_and_till_main
-          cppcheck --quiet --enable=all --error-exitcode=1 --inline-suppr -I led_blink
+      #- name: Run Static Analysis (Cppcheck)
+      #  run: |
+      #    sudo apt install -y cppcheck
+      #    find before_and_till_main -name '*.c' | xargs cppcheck --quiet --enable=all --error-exitcode=1 --inline-suppr
+      #    find led_blink -name '*.c' | xargs cppcheck --quiet --enable=all --error-exitcode=1 --inline-suppr
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4

@@ -1,0 +1,49 @@
+name: Build and Test STM32 Project
+
+on:
+  push:
+    branches:
+      - main
+      - dev   # Add other branches where you want this to trigger
+  pull_request:
+    branches:
+      - main  # Prevents merging if tests fail
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Uses GitHub-hosted VM
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y gcc-arm-none-eabi make
+
+      - name: Build Project (before_and_till_main)
+        run: |
+          cd before_and_till_main
+          make all
+
+      - name: Build Project (led_blink)
+        run: |
+          cd led_blink
+          make all
+
+      - name: Run Static Analysis (Cppcheck)
+        run: |
+          sudo apt install -y cppcheck
+          cppcheck --quiet --enable=all --error-exitcode=1 --inline-suppr -I before_and_till_main/*.c
+          cppcheck --quiet --enable=all --error-exitcode=1 --inline-suppr -I led_blink/*.c
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: stm32-build
+          path: |
+            before_and_till_main/build
+            led_blink/build
+
+

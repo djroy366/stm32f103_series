@@ -78,5 +78,9 @@ CPPCHECK = cppcheck
 .PHONY: CPPCHECK
 
 CPPCHECK:
+<<<<<<< HEAD
 	$(CPPCHECK) --quiet --enable=all --error-exitcode=1 --inline-suppr  $(wildcard *.c) 
+=======
+	$(CPPCHECK) --quiet --enable=all --error-exitcode=1 --inline-suppr -I $(INCLUDE_DIRS) $(wildcard *.c) 
+>>>>>>> 2ce504183ecb84e6ac627fd04f6e115979c512f7
 

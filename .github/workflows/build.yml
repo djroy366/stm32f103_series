@@ -35,8 +35,8 @@ jobs:
       - name: Run Static Analysis (Cppcheck)
         run: |
           sudo apt install -y cppcheck
-          cppcheck --quiet --enable=all --error-exitcode=1 --inline-suppr -I before_and_till_main/*.c
-          cppcheck --quiet --enable=all --error-exitcode=1 --inline-suppr -I led_blink/*.c
+          cppcheck --quiet --enable=all --error-exitcode=1 --inline-suppr --recursive before_and_till_main/
+          cppcheck --quiet --enable=all --error-exitcode=1 --inline-suppr --recursive led_blink/
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4

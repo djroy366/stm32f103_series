@@ -34,9 +34,9 @@ jobs:
 
       - name: Run Static Analysis (Cppcheck)
         run: |
+          sudo apt install -y cppcheck
           cd before_and_till_main
           make CPPCHECK
-      #    sudo apt install -y cppcheck
       #    find before_and_till_main -name '*.c' | xargs cppcheck --quiet --enable=all --error-exitcode=1 --inline-suppr
       #    find led_blink -name '*.c' | xargs cppcheck --quiet --enable=all --error-exitcode=1 --inline-suppr
 

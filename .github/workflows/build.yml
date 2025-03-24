@@ -32,8 +32,9 @@ jobs:
           cd led_blink
           make all
 
-      #- name: Run Static Analysis (Cppcheck)
-      #  run: |
+      - name: Run Static Analysis (Cppcheck)
+        run: |
+          make CPPCHECK
       #    sudo apt install -y cppcheck
       #    find before_and_till_main -name '*.c' | xargs cppcheck --quiet --enable=all --error-exitcode=1 --inline-suppr
       #    find led_blink -name '*.c' | xargs cppcheck --quiet --enable=all --error-exitcode=1 --inline-suppr
